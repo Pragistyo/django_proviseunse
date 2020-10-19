@@ -10,7 +10,7 @@ from django_api.response import Response
 # Create your views here.
 
 def index(request):
-    # data = serializers.serialize("json", Doctors.objects.all(), fields=('firstname','nik'))
+    # data = serializers.serialize("json", Doctors.objects.all())
     # return HttpResponse(data)
     doctors = Doctors.objects.all()
     doctors = transformer.transform(doctors)

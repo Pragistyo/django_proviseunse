@@ -20,13 +20,13 @@ def singleTransform(values):
         "state": values.state,
         "city": values.city,
         "zipcode": values.zipcode,
-        "birthplace": values.birthday,
+        "birthplace": values.birthplace,
         "birthday": values.birthday,
         "nik": values.nik,
         "specialization": values.specialization,
         "certificate": values.certificate,
         "datecertification": values.datecertification,
-        "countpatientnumber": values.certificate
+        "countpatientnumber": values.countpatientnumber
 
        
     }
