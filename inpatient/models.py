@@ -1,4 +1,6 @@
 from django.db import models
+from django.forms import ModelForm
+
 
 # Create your models here.
 class Inpatients (models.Model):
@@ -14,8 +16,16 @@ class Inpatients (models.Model):
     city = models.CharField(max_length=100)
     zipcode = models.CharField(max_length=100)
     birthplace = models.CharField(max_length=100)
-    birthday  = models.DateTimeField(null=True)
+    birthday  = models.DateField(null=True, blank=True)
     bloodtype = models.CharField(max_length=2)
 
     class Meta:
         db_table = 'inpatient'
+        
+    def __str__(self):
+        return self.firstname[0] 
+
+class InpatientsForm(ModelForm):
+    class Meta:
+        model = Inpatients
+        fields = '__all__'
