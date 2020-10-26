@@ -6,8 +6,8 @@ from django.forms import ModelForm
 # Create your models here.
 class MedicalRecords(models.Model):
     medicalrecord_id = models.AutoField(primary_key=True, serialize=True)
-    inpatient_id = models.ForeignKey(Inpatients, on_delete=models.DO_NOTHING)
-    doctor_id = models.ForeignKey(Doctors, on_delete=models.DO_NOTHING)
+    inpatient_id = models.ForeignKey(Inpatients, on_delete=models.DO_NOTHING, db_column= "inpatient_id")
+    doctor_id = models.ForeignKey(Doctors, on_delete=models.DO_NOTHING, db_column= "doctor_id")
     consultdate = models.DateField()
     bloodpressure = models.IntegerField()
     bpmnumber = models.IntegerField()
