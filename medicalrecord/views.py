@@ -3,6 +3,7 @@ from django.http import HttpResponse
 from django.core import serializers
 from .models import MedicalRecords
 from .models import MedicalRecordsForm
+from . import transformer
 from django.views.decorators.csrf import csrf_exempt
 from django.db import connection, transaction
 
@@ -15,6 +16,7 @@ def index(request):
         med_rec = MedicalRecords.objects.all()
         result = serializers.serialize("json", med_rec)
         return HttpResponse(result)
+        
     elif request.method == 'POST':
         json_data = json.loads(request.body)
         print(json_data)
@@ -31,6 +33,7 @@ def show(request, medicalrecord_id):
         med_rec_one = MedicalRecords.objects.get(pk=medicalrecord_id)
         data = serializers.serialize("json", [med_rec_one, ])
         return HttpResponse(data)
+
     elif request.method =='DELETE':
         # del_med_rec = MedicalRecords.objects.get(pk=medicalrecord_id).delete()
         queryRemove =  '''
@@ -46,10 +49,16 @@ def show(request, medicalrecord_id):
         '''
         valueRemove = [medicalrecord_id, medicalrecord_id]
         with connection.cursor() as cursor:
-            row = cursor.execute(queryRemove, valueRemove)
-            print('row')
+            cursor.execute(queryRemove, valueRemove)
+            row = cursor.fetchall()[0]
+            print('================= DELETE ROW ====================')
+            print(type(row))
             print(row)
-        return HttpResponse('data deleted')
+            #row = (20, 1, 5, datetime.date(2019, 3, 19), 105, 90, 'normal', Decimal('36.80'), 'GI')
+            deleteInfo = transformer.dictTransformMedicalRecord(row)
+            result = json.dumps(deleteInfo)
+        return HttpResponse(result, content_type='application/json')
+
     elif request.method == 'PUT':
         json_data = json.loads(request.body)
         update_med_rec = MedicalRecords.objects.filter(pk=medicalrecord_id).update(
@@ -91,13 +100,20 @@ def customQuery(request):
             json_data['inpatient_id'],json_data['doctor_id'], json_data['consultdate'], json_data['bloodpressure'],json_data['bpmnumber'],
             json_data['pupil'],json_data['temperature'],json_data['polyclinic']
         ]
-        print('======================================== sampe sini masuk')
+        print('================== create medical record ====================== ')
         with connection.cursor() as cursor:
             cursor.execute(queryInsert, valueInsert)
-            latest_obj = MedicalRecords.objects.latest('medicalrecord_id')
-            print('latest_obj')
-            print(type(latest_obj))
-            # print(latest_obj)
-            result = serializers.serialize("json", latest_obj)
-        return HttpResponse(result)
+            latest_obj = cursor.fetchall()[0] #<class 'tuple>
+            # latest_obj =  (
+            # '(15,1,5,2019-03-19,105,90,normal,36.80,GI)', 10, 'Ridho', 'Ardhi', 'Syaiful'
+            # )
+            arrDataInserted = latest_obj[0][1:-1].split(',') #[15,1,5,2019-03-19,105,90,normal,36.80,GI]
+            doctorName = latest_obj[2]+ ' ' +latest_obj[3]+'  ' + latest_obj[4]
+            doctorInfo = {"doctorName": doctorName, "currentCountpatientnumber": latest_obj[1]}
+
+            dictResult= transformer.dictTransformCreate(arrDataInserted, doctorInfo)
+            print("==============RESULT=================")
+            print(type(dictResult))
+            result = json.dumps(dictResult)
+        return HttpResponse(result, content_type='application/json')
 
