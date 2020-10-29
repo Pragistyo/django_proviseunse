@@ -1,10 +1,5 @@
 {
     "python.pythonPath": "venv\\Scripts\\python.exe",
-    "editor.detectIndentation": false,
     "terminal.integrated.fontWeightBold": "900",
     "terminal.integrated.fontWeight": "500",
-    "editor.fontFamily": "Consolas, monospace, 'Courier New'",
-    "editor.fontSize": 16,
-    "terminal.integrated.fontFamily": "Consolas",
-    "editor.fontWeight": "bold"
 }
