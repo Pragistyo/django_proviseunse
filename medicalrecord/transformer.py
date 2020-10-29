@@ -10,7 +10,7 @@ def transform(values):
 
 
 
-def dictTransform(arrDataInserted, doctorInfo):
+def dictTransformCreate(arrDataInserted, doctorInfo):
 
     return {
             "doctorname" : doctorInfo["doctorName"],
@@ -21,4 +21,17 @@ def dictTransform(arrDataInserted, doctorInfo):
             "pupil": arrDataInserted[6],
             "temperature": arrDataInserted[7],
             "polyclinic": arrDataInserted[8]
+    }
+
+def dictTransformMedicalRecord(value):
+    return{
+        "medicalrecord_id":value[0],
+        "inpatient_id": value[1],
+        "doctor_id": value[2],
+        "consultdate": value[3].strftime('%Y-%m-%d'),
+        "bloodpressure": value[4],
+        "bpmnumber": value[5],
+        "pupil": value[6],
+        "temperature": str(value[7]),
+        "polyclinic": value[8],
     }

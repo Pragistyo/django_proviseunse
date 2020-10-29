@@ -16,6 +16,7 @@ def index(request):
         med_rec = MedicalRecords.objects.all()
         result = serializers.serialize("json", med_rec)
         return HttpResponse(result)
+        
     elif request.method == 'POST':
         json_data = json.loads(request.body)
         print(json_data)
@@ -32,6 +33,7 @@ def show(request, medicalrecord_id):
         med_rec_one = MedicalRecords.objects.get(pk=medicalrecord_id)
         data = serializers.serialize("json", [med_rec_one, ])
         return HttpResponse(data)
+
     elif request.method =='DELETE':
         # del_med_rec = MedicalRecords.objects.get(pk=medicalrecord_id).delete()
         queryRemove =  '''
@@ -49,10 +51,14 @@ def show(request, medicalrecord_id):
         with connection.cursor() as cursor:
             cursor.execute(queryRemove, valueRemove)
             row = cursor.fetchall()[0]
-            print('row')
+            print('================= DELETE ROW ====================')
+            print(type(row))
             print(row)
-        # print(del_med_rec)
-        return HttpResponse('data deleted')
+            #row = (20, 1, 5, datetime.date(2019, 3, 19), 105, 90, 'normal', Decimal('36.80'), 'GI')
+            deleteInfo = transformer.dictTransformMedicalRecord(row)
+            result = json.dumps(deleteInfo)
+        return HttpResponse(result, content_type='application/json')
+
     elif request.method == 'PUT':
         json_data = json.loads(request.body)
         update_med_rec = MedicalRecords.objects.filter(pk=medicalrecord_id).update(
@@ -105,7 +111,7 @@ def customQuery(request):
             doctorName = latest_obj[2]+ ' ' +latest_obj[3]+'  ' + latest_obj[4]
             doctorInfo = {"doctorName": doctorName, "currentCountpatientnumber": latest_obj[1]}
 
-            dictResult= transformer.dictTransform(arrDataInserted, doctorInfo)
+            dictResult= transformer.dictTransformCreate(arrDataInserted, doctorInfo)
             print("==============RESULT=================")
             print(type(dictResult))
             result = json.dumps(dictResult)
