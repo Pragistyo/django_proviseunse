@@ -35,3 +35,13 @@ def dictTransformMedicalRecord(value):
         "temperature": str(value[7]),
         "polyclinic": value[8],
     }
+
+def dictTransformGetByDate(value):
+        return{
+            "polyclinic": value[0],
+            "consult_total": str(value[1]) + " times",
+            "ab_bloodtype" : str(value[5])+ " times",
+            "a_bloodtype" : str(value[4])+ " times",
+            "b_bloodtype" : str(value[3])+ " times",
+            "o_bloodtype" : str(value[2])+ " times"
+        }
