@@ -4,6 +4,7 @@ from django.core import serializers
 from .models import MedicalRecords
 from .models import MedicalRecordsForm
 from . import transformer
+from . import rawQuery
 from django.views.decorators.csrf import csrf_exempt
 from django.db import connection, transaction
 
@@ -20,11 +21,28 @@ def index(request):
     elif request.method == 'POST':
         json_data = json.loads(request.body)
         print(json_data)
-        formMedicalRecord = MedicalRecordsForm(json_data)
-        if formMedicalRecord.is_valid():
-            formMedicalRecord.save()
-            return HttpResponse('data added')
-        return HttpResponse('form_data not valid')
+        # nanti coba ganti pake transaction
+        queryInsert = rawQuery.queryInsert
+        valueInsert = [
+            json_data['inpatient_id'],json_data['doctor_id'], json_data['consultdate'], json_data['bloodpressure'],json_data['bpmnumber'],
+            json_data['pupil'],json_data['temperature'],json_data['polyclinic']
+        ]
+        print('================== create medical record ====================== ')
+        with connection.cursor() as cursor:
+            cursor.execute(queryInsert, valueInsert)
+            latest_obj = cursor.fetchall()[0] #<class 'tuple>
+            # latest_obj =  (
+            # '(15,1,5,2019-03-19,105,90,normal,36.80,GI)', 10, 'Ridho', 'Ardhi', 'Syaiful'
+            # )
+            arrDataInserted = latest_obj[0][1:-1].split(',') #[15,1,5,2019-03-19,105,90,normal,36.80,GI]
+            doctorName = latest_obj[2]+ ' ' +latest_obj[3]+'  ' + latest_obj[4]
+            doctorInfo = {"doctorName": doctorName, "currentCountpatientnumber": latest_obj[1]}
+
+            dictResult= transformer.dictTransformCreate(arrDataInserted, doctorInfo)
+            print("==============RESULT=================")
+            print(type(dictResult))
+            result = json.dumps(dictResult)
+        return HttpResponse(result, content_type='application/json')
 
 @csrf_exempt
 def show(request, medicalrecord_id):
@@ -36,17 +54,7 @@ def show(request, medicalrecord_id):
 
     elif request.method =='DELETE':
         # del_med_rec = MedicalRecords.objects.get(pk=medicalrecord_id).delete()
-        queryRemove =  '''
-        WITH u AS (
-            UPDATE doctor 
-            SET countpatientnumber = countpatientnumber - 1
-            WHERE 
-                doctor.doctor_id = (SELECT doctor_id FROM medicalrecord WHERE medicalrecord_id = %s) 
-            RETURNING *
-        )
-        DELETE from medicalrecord WHERE medicalrecord_id = %s
-        RETURNING *
-        '''
+        queryRemove =  rawQuery.queryRemove
         valueRemove = [medicalrecord_id, medicalrecord_id]
         with connection.cursor() as cursor:
             cursor.execute(queryRemove, valueRemove)
@@ -79,41 +87,51 @@ def show(request, medicalrecord_id):
 @csrf_exempt
 def customQuery(request):
     if request.method =='POST':
-        json_data = json.loads(request.body)
-        # nanti coba ganti pake transaction
-        queryInsert = '''
-        WITH i AS (
-            INSERT INTO medicalrecord
-            (medicalrecord_id, inpatient_id, doctor_id, consultdate, bloodpressure, bpmnumber ,pupil, temperature, polyclinic)
-            VALUES 
-            (DEFAULT, %s,%s,%s, %s,
-            %s, %s, %s,%s)
-            RETURNING *
-        )
-        UPDATE doctor AS a
-            SET countpatientnumber = countpatientnumber + 1
-            FROM i
-            WHERE i.doctor_id = a.doctor_id
-        RETURNING i, countpatientnumber, firstname, middlename, lastname
-        '''
-        valueInsert = [
-            json_data['inpatient_id'],json_data['doctor_id'], json_data['consultdate'], json_data['bloodpressure'],json_data['bpmnumber'],
-            json_data['pupil'],json_data['temperature'],json_data['polyclinic']
-        ]
-        print('================== create medical record ====================== ')
-        with connection.cursor() as cursor:
-            cursor.execute(queryInsert, valueInsert)
-            latest_obj = cursor.fetchall()[0] #<class 'tuple>
-            # latest_obj =  (
-            # '(15,1,5,2019-03-19,105,90,normal,36.80,GI)', 10, 'Ridho', 'Ardhi', 'Syaiful'
-            # )
-            arrDataInserted = latest_obj[0][1:-1].split(',') #[15,1,5,2019-03-19,105,90,normal,36.80,GI]
-            doctorName = latest_obj[2]+ ' ' +latest_obj[3]+'  ' + latest_obj[4]
-            doctorInfo = {"doctorName": doctorName, "currentCountpatientnumber": latest_obj[1]}
+        print('============ json =================')
+        body_unicode = request.body.decode('utf-8')
+        print(type( request.body))
+        print( request.body)
+        json_data = json.loads( request.body)
+        print(json_data)
 
-            dictResult= transformer.dictTransformCreate(arrDataInserted, doctorInfo)
-            print("==============RESULT=================")
-            print(type(dictResult))
+        queryGetByDate=''
+        valueGetByDate = []
+
+        if json_data['polyclinic'] == None or json_data['polyclinic'] == '' :
+            print("-----------------NO POLYCLINIC-------------------")
+            valueGetByDate.extend([json_data['dateFrom'], json_data['dateTo']])
+            queryGetByDate = rawQuery.queryMedicalRecordDateRange
+            
+        elif json_data['polyclinic'] :
+            print("+++++++++++ WITH POLYCLINIC +++++++++++")
+            valueGetByDate.extend([json_data['polyclinic'], json_data['dateFrom'], json_data['dateTo']])
+            queryGetByDate = rawQuery.queryMedicalRecordDateRangePolyclinic
+
+        with connection.cursor() as cursor:
+            cursor.execute(queryGetByDate, valueGetByDate)
+            row = cursor.fetchall()
+            print("=================== RESULT ROW =====================")
+            print(type(row))
+            print(row)
+
+            arrPolyclinic = []
+
+            for val in row:
+                arrPolyclinic.append( val[0] )
+
+            rowInfo = [arrPolyclinic, row[0][1], row[0][2], row[0][3], row[0][4], row[0][5] ]
+            # ('Polyclinic', consult_total, O, A, B, AB)
+            # [ 
+            # ('GI', 9, 9, 0, 0, 0), ('GI', 9, 9, 0, 0, 0), ('GI', 9, 9, 0, 0, 0), 
+            # ('GI', 9, 9, 0, 0, 0), ('GI', 9, 9, 0, 0, 0), ('GI', 9, 9, 0, 0, 0), 
+            # ('GI', 9, 9, 0, 0, 0), ('GI', 9, 9, 0, 0, 0), ('GI', 9, 9, 0, 0, 0)
+            # ]
+            dictResult = transformer.dictTransformGetByDate(rowInfo)
             result = json.dumps(dictResult)
+        # return HttpResponse('getBydatePolyclinic:')
         return HttpResponse(result, content_type='application/json')
 
+
+
+# b'{\n    "dateFrom": "2018-01-01",\n    "dateTo" : "2020-01-01",\n    "polyclinic" : "GI"\n\n}'
+# b'dateFrom=2018-01-01&dateTo=2020-01-01&polyclinic=GI'
