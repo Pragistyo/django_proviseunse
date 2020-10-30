@@ -19,9 +19,9 @@ localhost:PORT/provisions/api/v1
 | --------------------------------- | ------ | --------------|
 | `/doctors`      | GET    | Get all doctors data
 | `/doctors`      | POST   | Create one doctor data
-| `/:id/doctor`  | GET    | Get one doctor data
-| `/:id/doctor`  | PUT    | Update one doctor data
-| `/:id/doctor`  | DELETE | Delete one doctor data
+| `/doctor/:id/detail/`  | GET    | Get one doctor data
+| `/doctor/:id/detail/`  | PUT    | Update one doctor data
+| `/doctor/:id/detail/`  | DELETE | Delete one doctor data
 
 
 #### Inpatient Routes
@@ -30,9 +30,9 @@ localhost:PORT/provisions/api/v1
 | ------------------------------------ | ------ | --------------|
 | `/inpatient`      | GET    | Get all Inpatients data
 | `/inpatient`      | POST   | Create one Inpatient data
-| `/:id/inpatient`  | GET    | Get one Inpatient data
-| `/:id/inpatient`  | PUT    | Update one Inpatient data
-| `/:id/inpatient`  | DELETE | Delete one Inpatient data
+| `/inpatient/:id/detail/`  | GET    | Get one Inpatient data
+| `/inpatient/:id/detail/`  | PUT    | Update one Inpatient data
+| `/inpatient/:id/detail/`  | DELETE | Delete one Inpatient data
 
 
 #### Medical Records Routes
@@ -47,6 +47,6 @@ Medical Records Routes have several feature:
 | `/medicalRecord`                       | GET    | Get all medicalRecord data
 | `/medicalRecord`                       | POST   | Create one medicalRecord data
 | `/medicalRecord/customQuery/getBydatePolyclinic`      | POST   | Return consult sum by date interval and/or selected polyclinic
-| `/:id/medicalRecord`                   | GET    | Get one medicalRecord data
-| `/:id/medicalRecord`                   | PUT    | Update one medicalRecord data
-| `/:id/medicalRecord`                   | DELETE | Delete one medicalRecord data
+| `/medicalRecord/:id/detail/`                   | GET    | Get one medicalRecord data
+| `/medicalRecord/:id/detail/`                   | PUT    | Update one medicalRecord data
+| `/medicalRecord/:id/detail/`                   | DELETE | Delete one medicalRecord data
