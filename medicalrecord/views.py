@@ -88,7 +88,6 @@ def show(request, medicalrecord_id):
 def customQuery(request):
     if request.method =='POST':
         print('============ json =================')
-        body_unicode = request.body.decode('utf-8')
         print(type( request.body))
         print( request.body)
         json_data = json.loads( request.body)
@@ -132,6 +131,3 @@ def customQuery(request):
         return HttpResponse(result, content_type='application/json')
 
 
-
-# b'{\n    "dateFrom": "2018-01-01",\n    "dateTo" : "2020-01-01",\n    "polyclinic" : "GI"\n\n}'
-# b'dateFrom=2018-01-01&dateTo=2020-01-01&polyclinic=GI'
