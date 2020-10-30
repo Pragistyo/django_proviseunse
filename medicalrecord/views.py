@@ -131,6 +131,3 @@ def customQuery(request):
         return HttpResponse(result, content_type='application/json')
 
 
-# Coba bikin pake class form buat handle
-# b'{\n    "dateFrom": "2018-01-01",\n    "dateTo" : "2020-01-01",\n    "polyclinic" : "GI"\n\n}'
-# b'dateFrom=2018-01-01&dateTo=2020-01-01&polyclinic=GI'
