@@ -37,6 +37,11 @@ localhost:PORT/provisions/api/v1
 
 #### Medical Records Routes
 
+Medical Records Routes have several feature:
+- When Create Medical Records, increase "countpatientnumber" field in doctor table, for ralated doctor
+- When Delete Medical Records, decrease "countpatientnumber field in doctor table, for related doctor
+- getByDatePolyclinic: input the range dateFrom and dateTo, to get data count all patient which consult at those that. Furthermore, count patient based on their blood type
+
 | Route                                                    |  HTTP  | Description |
 | -------------------------------------------------------- | ------ | --------------|
 | `/medicalRecord`                       | GET    | Get all medicalRecord data
