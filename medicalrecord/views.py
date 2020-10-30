@@ -10,6 +10,11 @@ from django.db import connection, transaction
 
 import json
 # Create your views here.
+<<<<<<< HEAD
+<<<<<<< inpatient
+=======
+=======
+>>>>>>> master
 
 @csrf_exempt
 def index(request):
