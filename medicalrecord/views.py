@@ -130,4 +130,3 @@ def customQuery(request):
         # return HttpResponse('getBydatePolyclinic:')
         return HttpResponse(result, content_type='application/json')
 
-

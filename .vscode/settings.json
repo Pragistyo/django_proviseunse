@@ -2,4 +2,6 @@
     "python.pythonPath": "venv\\Scripts\\python.exe",
     "terminal.integrated.fontWeightBold": "900",
     "terminal.integrated.fontWeight": "500",
+    "python.linting.pylintEnabled": true,
+    "python.linting.enabled": true,
 }
