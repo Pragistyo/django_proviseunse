@@ -1,8 +1,20 @@
-from django.shortcuts import render
+# from django.shortcuts import render
+from django.http import HttpResponse
+from django.core import serializers
+from .models import MedicalRecords
+from .models import MedicalRecordsForm
+from . import transformer
+from . import rawQuery
+from django.views.decorators.csrf import csrf_exempt
+from django.db import connection, transaction
 
+import json
 # Create your views here.
+<<<<<<< HEAD
 <<<<<<< inpatient
 =======
+=======
+>>>>>>> master
 
 @csrf_exempt
 def index(request):
@@ -122,5 +134,4 @@ def customQuery(request):
             result = json.dumps(dictResult)
         # return HttpResponse('getBydatePolyclinic:')
         return HttpResponse(result, content_type='application/json')
-
 
